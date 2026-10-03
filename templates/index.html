@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f3ec">
+    <title>Fieldnotes | Knowledge Graph</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/app.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script defer src="/static/app.js"></script>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="Fieldnotes home"><span class="brand-mark">f.</span><span class="brand-name">fieldnotes <span>/ graph lab</span></span></a>
+        <div class="top-right">
+            <div class="connection"><span class="status-dot" id="status-dot"></span><span id="connection-label">Checking MongoDB</span></div>
+            <div class="ingest-control">
+                <select class="ingest-select" id="ingest-limit" aria-label="Maximum articles to ingest"><option value="150">150 articles</option><option value="500">500 articles</option><option value="1000">1,000 articles</option></select>
+                <button class="primary-button" id="ingest-button" type="button">↧ &nbsp;Stream data</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="page-heading">
+            <div><div class="eyebrow">MongoDB · semantic index · graph traversal</div><h1>Knowledge graph explorer</h1><p class="heading-note">Search the collection, follow connections, inspect the source.</p></div>
+            <div class="refresh-note" id="refresh-note">LIVE COLLECTION METRICS</div>
+        </section>
+        <section class="metrics" aria-label="MongoDB collection metrics">
+            <div class="metric"><div class="metric-label">Documents</div><div class="metric-value" id="metric-documents">--</div></div>
+            <div class="metric"><div class="metric-label">Graph edges</div><div class="metric-value" id="metric-edges">--</div></div>
+            <div class="metric"><div class="metric-label">Entity mentions</div><div class="metric-value" id="metric-entities">--</div></div>
+            <div class="metric"><div class="metric-label">Mongo indexes</div><div class="metric-value" id="metric-indexes">-- <small id="metric-ping">-- ms</small></div></div>
+        </section>
+        <section class="layout">
+            <aside class="sidebar">
+                <section class="panel query-panel">
+                    <h2 class="section-title">Semantic search <span class="count">01 / QUERY</span></h2>
+                    <form id="query-form">
+                        <div class="query-row"><input class="query-input" id="query-input" type="search" value="historical campaigns and warfare" placeholder="Ask about the collection" autocomplete="off" aria-label="Search the knowledge graph"><button class="primary-button query-submit" id="query-button" type="submit">Find</button></div>
+                        <div class="query-options"><label for="depth-select">MongoDB graph depth</label><select class="depth-select" id="depth-select" aria-label="Graph traversal depth"><option value="1">1 hop</option><option value="2">2 hops</option><option value="3" selected>3 hops</option><option value="4">4 hops</option><option value="5">5 hops</option></select></div>
+                    </form>
+                </section>
+                <section class="panel excerpt-panel" aria-live="polite">
+                    <h2 class="section-title">Anchor document <span class="count" id="anchor-score">WAITING</span></h2>
+                    <h3 class="excerpt-title" id="anchor-title">No document selected</h3>
+                    <div class="excerpt-meta"><span class="tag">SOURCE TEXT</span><span id="anchor-time">Run a search to explore</span></div>
+                    <p class="excerpt-text" id="anchor-excerpt">The closest matching document and its graph neighborhood will appear here.</p>
+                </section>
+                <section class="panel entity-panel"><h2 class="section-title">Most connected entities <span class="count">TOP 6</span></h2><div class="entity-list" id="entity-list"><div class="entity-item muted">Waiting for MongoDB metrics</div></div></section>
+                <section class="panel chart-panel"><h2 class="section-title">Relationship mix <span class="count">AGGREGATED</span></h2><div class="chart-wrap"><canvas id="relationship-chart" aria-label="Relationship types in the graph"></canvas></div></section>
+            </aside>
+            <div class="graph-column">
+                <section class="graph-panel" aria-label="Interactive knowledge graph">
+                    <div class="graph-header"><div><div class="graph-heading">Neighborhood map</div><div class="graph-subheading" id="graph-caption">Awaiting a query</div></div><div class="graph-legend"><span class="legend-item"><span class="legend-dot"></span>DOCUMENT</span><span class="legend-item"><span class="legend-dot entity"></span>ENTITY</span></div></div>
+                    <div id="graph-canvas"></div>
+                    <div class="graph-empty" id="graph-empty"><div><strong>Your graph starts here</strong>Search your indexed collection or stream a dataset.</div></div>
+                    <div class="graph-footer"><span id="graph-counts">0 nodes · 0 links</span><span id="graph-hint">Select a node to recenter</span></div>
+                </section>
+                <section class="panel relationship-panel"><div class="relationship-head"><h2 class="section-title">Edge volume by relationship</h2><span class="count" id="relationship-total">LIVE AGGREGATION</span></div><div class="relationship-chart"><canvas id="relationship-bars" aria-label="MongoDB edge counts by relationship type"></canvas></div></section>
+            </div>
+        </section>
+    </main>
+    <div class="notice" id="notice" role="status" aria-live="polite"></div>
+</body>
+</html>
