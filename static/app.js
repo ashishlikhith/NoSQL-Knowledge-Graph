@@ -129,11 +129,11 @@ function renderGraph(data) {
     });
     document.getElementById('graph-empty').hidden = data.nodes.length > 0;
     document.getElementById('graph-counts').textContent = `${data.nodes.length} nodes · ${data.links.length} links`;
-    document.getElementById('graph-caption').textContent = `Anchor match ${(data.anchor_score * 100).toFixed(1)}% · ${data.depth}-hop traversal`;
+    document.getElementById('graph-caption').textContent = `Cosine similarity ${(data.anchor_score * 100).toFixed(1)}% · ${data.depth}-hop traversal`;
     document.getElementById('graph-hint').textContent = `${data.query_time_ms} ms · Select a node to recenter`;
     document.getElementById('anchor-title').textContent = data.anchor_title;
     document.getElementById('anchor-excerpt').textContent = data.anchor_excerpt;
-    document.getElementById('anchor-score').textContent = `${(data.anchor_score * 100).toFixed(1)}% MATCH`;
+    document.getElementById('anchor-score').textContent = `${(data.anchor_score * 100).toFixed(1)}% COSINE`;
     document.getElementById('anchor-time').textContent = `${data.query_time_ms} ms · ${data.depth} hops`;
 }
 
@@ -153,7 +153,22 @@ async function search(intent) {
         if (data.status !== 'success') throw new Error(data.message || 'No matching document found.');
         renderGraph(data);
     } catch (error) {
-        document.getElementById('graph-caption').textContent = 'Search could not be completed';
+        const noRelevantData = error.message.startsWith('No relevant data found');
+        document.getElementById('graph-caption').textContent = noRelevantData
+            ? 'No relevant data found'
+            : 'Search could not be completed';
+        if (noRelevantData) {
+            if (graph) graph.destroy();
+            graph = null;
+            graphElement.replaceChildren();
+            document.getElementById('graph-empty').hidden = false;
+            document.getElementById('graph-counts').textContent = '0 nodes · 0 links';
+            document.getElementById('graph-hint').textContent = 'Try a different search';
+            document.getElementById('anchor-title').textContent = 'No relevant data found';
+            document.getElementById('anchor-excerpt').textContent = 'No indexed passage matched this search closely enough.';
+            document.getElementById('anchor-score').textContent = 'NO MATCH';
+            document.getElementById('anchor-time').textContent = '';
+        }
         showNotice(error.message);
     } finally {
         button.disabled = false;

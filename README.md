@@ -5,6 +5,7 @@ A local knowledge-graph explorer built with FastAPI, PyMongo, Sentence Transform
 ## Features
 
 - Semantic anchor search using the local `all-MiniLM-L6-v2` embedding model.
+- Rejects searches whose best cosine similarity is below `0.30`; this is a similarity cutoff, not a calibrated relevance probability.
 - Interactive force-directed graph with document and entity nodes. Select a node to search around it.
 - Adjustable MongoDB graph traversal depth (1-5 hops).
 - Live MongoDB document, edge, entity-mention, index-count, and ping metrics.
@@ -80,7 +81,7 @@ FastAPI's interactive API docs are at `/docs` while the server is running.
 1. The pipeline streams WikiText-103 and filters short records and markup headings.
 2. Sentence Transformers embeds each 800-character excerpt; spaCy extracts people, organizations, and locations.
 3. PyMongo writes documents and `CONTAINS` edges in batches. A vectorized cosine-similarity matrix adds cross-document edges above the configured threshold.
-4. Search embeds the query, compares it against stored vectors, and selects the closest document as its anchor.
+4. Search embeds the query, compares it against stored vectors, and selects the closest document as its anchor only when its cosine similarity is at least `0.30`; otherwise, it reports that no relevant data was found.
 5. MongoDB's native `$graphLookup` traverses outgoing edges. The API returns graph nodes, links, source excerpt, similarity, and elapsed query time.
 
 ## Retrieval evaluation

@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+MIN_COSINE_SIMILARITY = 0.30
 
 def live_graph_rag_query(search_intent, chunks_col, edges_col, max_depth=2):
     started_at = time.perf_counter()
@@ -23,8 +24,11 @@ def live_graph_rag_query(search_intent, chunks_col, edges_col, max_depth=2):
     anchor_chunk = all_chunks[anchor_index]
     top_score = float(scores[anchor_index])
             
-    if not anchor_chunk or top_score < 0.15:
-        return {"status": "error", "message": "No matching contextual anchor found."}
+    if not anchor_chunk or top_score < MIN_COSINE_SIMILARITY:
+        return {
+            "status": "error",
+            "message": "No relevant data found. Try a search that better matches the indexed passages.",
+        }
         
     # 3. USE PYMONGO NATIVE GRAPH LOOKUP PIPELINE
     # This runs directly inside the database, completely preventing freezes!
