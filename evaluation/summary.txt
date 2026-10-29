@@ -1,0 +1,16 @@
+Retrieval evaluation: existing Sentence Transformers cosine baseline
+Metrics are retrieval-quality measures, not ordinary classification accuracy.
+Precision@5, Recall@5, and nDCG@5 are shown as percentages; MRR is the reciprocal rank of the first relevant document across the full ranking.
+Latency measures query embedding plus full cosine ranking; model startup and MongoDB document loading are excluded.
+Database: nosql_enterprise_graph_rag
+Indexed documents: 150
+Labeled queries evaluated: 5
+Unlabeled query rows skipped: 0
+Positive query-document judgments: 135
+Unique judged relevant documents: 74
+Mean precision_at_5_percent: 40.00%
+Mean recall_at_5_percent: 9.27%
+Mean mrr_percent: 63.33%
+Mean ndcg_at_5_percent: 40.47%
+Average query latency: 21.90 ms
+Labels are manually judged but not certified exhaustive. Recall and nDCG are conditional on the supplied labels; missing relevant documents can distort scores.

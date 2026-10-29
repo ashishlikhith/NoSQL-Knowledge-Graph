@@ -1,0 +1,6 @@
+method,query,relevant_document_count,precision_at_5_percent,recall_at_5_percent,mrr_percent,ndcg_at_5_percent,query_latency_ms
+sentence_transformer_cosine_baseline,historical campaigns and warfare,35,40.00,5.71,33.33,31.56,37.01
+sentence_transformer_cosine_baseline,people and organizations in history,41,40.00,4.88,33.33,30.08,14.06
+sentence_transformer_cosine_baseline,places and geography,6,20.00,16.67,50.00,21.40,18.67
+sentence_transformer_cosine_baseline,political history and government,26,80.00,15.38,100.00,85.39,16.92
+sentence_transformer_cosine_baseline,science and technology,27,20.00,3.70,100.00,33.92,22.86

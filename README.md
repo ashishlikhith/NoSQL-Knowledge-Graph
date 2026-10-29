@@ -83,6 +83,26 @@ FastAPI's interactive API docs are at `/docs` while the server is running.
 4. Search embeds the query, compares it against stored vectors, and selects the closest document as its anchor.
 5. MongoDB's native `$graphLookup` traverses outgoing edges. The API returns graph nodes, links, source excerpt, similarity, and elapsed query time.
 
+## Retrieval evaluation
+
+The standalone `evaluate_retrieval.py` script measures the existing embedding/cosine retrieval baseline against manually judged relevance labels. It does not change the app or `/api/query` response. The starter query rows in `evaluation/relevance_labels.csv` are examples only: their blank labels are not ground truth, and the script reports no scores until you add labels.
+
+To label a query, enter every relevant `chunk_id` from the current indexed collection in `relevant_doc_ids`, separated by semicolons. For example, `wiki_node_3;wiki_node_8`. Judge relevance by reading the documents, not by their similarity score. For Recall@5 and nDCG@5, labels should include all relevant documents in the indexed collection for each query; incomplete judgments can distort those metrics. Refresh labels if ingestion changes document IDs or contents.
+
+With the project environment active and MongoDB running with ingested data:
+
+```powershell
+python evaluate_retrieval.py
+```
+
+The script writes per-query metrics to `evaluation/results.csv` and aggregate metrics and limitations to `evaluation/summary.txt`. To list IDs and titles for manual judgments in `mongosh`, connect to the configured database and run:
+
+```javascript
+db.knowledge_chunks.find({}, { _id: 0, chunk_id: 1, title: 1 })
+```
+
+The report includes Precision@5, Recall@5, and nDCG@5 as percentages; MRR is the reciprocal rank of the first relevant document across the full ranking. It also reports average query latency. These are retrieval-quality metrics, not ordinary classification accuracy. Latency covers query embedding and full cosine ranking, excluding model startup and loading the MongoDB collection. Fewer than five labeled queries are flagged as preliminary. A cross-encoder comparison is not included; it would require downloading and evaluating a second model.
+
 ## Notes and limitations
 
 - WikiText-103 is a language-model dataset derived from Wikipedia articles; records are text segments, not guaranteed complete or clean article pages.
